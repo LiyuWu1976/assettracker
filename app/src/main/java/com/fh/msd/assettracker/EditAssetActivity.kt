@@ -15,10 +15,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
 import com.fh.msd.assettracker.viewmodel.EditAssetViewModel
 
@@ -30,8 +32,8 @@ class EditAssetActivity : ComponentActivity() {
         val assetId = intent.getStringExtra("ASSET_ID") ?: ""
         val assetName = intent.getStringExtra("ASSET_NAME") ?: ""
         val assetPrice = intent.getDoubleExtra("ASSET_PRICE", 0.0)
-        val assetCategory = intent.getStringExtra("ASSET_CATEGORY") ?: "Laptops"
-        val assetStatus = intent.getStringExtra("ASSET_STATUS") ?: "On Shelf"
+        val assetCategory = intent.getStringExtra("ASSET_CATEGORY") ?: "Laptop"
+        val assetStatus = intent.getStringExtra("ASSET_STATUS") ?: "In Use"
         val assetCurrency = intent.getStringExtra("ASSET_CURRENCY") ?: "EUR"
 
         setContent {
@@ -44,48 +46,6 @@ class EditAssetActivity : ComponentActivity() {
                     initialStatus = assetStatus,
                     initialCurrency = assetCurrency,
                     onBack = { finish() }
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownField(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
                 )
             }
         }
@@ -117,7 +77,7 @@ fun EditAssetScreen(
     var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val categories = listOf("Laptops", "phones", "Boards", "Cameras", "lenses", "Cables", "Software")
+    val categories = listOf("Laptop", "phone", "Board", "Camera", "lens", "Cable", "Software")
     val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
     val currencies = listOf("EUR", "USD")
 
@@ -209,6 +169,12 @@ fun EditAssetScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            DropdownField(
+                label = stringResource(R.string.asset_category),
+                options = categories,
+                selectedOption = category,
+                onOptionSelected = { category = it }
+            )
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -223,26 +189,17 @@ fun EditAssetScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
-
-            DropdownField(
-                label = stringResource(R.string.asset_category),
-                options = categories,
-                selectedOption = category,
-                onOptionSelected = { category = it }
-            )
-
-            DropdownField(
-                label = stringResource(R.string.asset_status),
-                options = statuses,
-                selectedOption = status,
-                onOptionSelected = { status = it }
-            )
-
             DropdownField(
                 label = stringResource(R.string.asset_currency),
                 options = currencies,
                 selectedOption = currency,
                 onOptionSelected = { currency = it }
+            )
+            DropdownField(
+                label = stringResource(R.string.asset_status),
+                options = statuses,
+                selectedOption = status,
+                onOptionSelected = { status = it }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -252,7 +209,8 @@ fun EditAssetScreen(
                     val priceValue = price.toDoubleOrNull() ?: 0.0
                     viewModel.updateAsset(assetId, name, category, priceValue, currency, status)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.actionButtonColor))
             ) {
                 Text(stringResource(R.string.btn_save))
             }
@@ -280,48 +238,6 @@ fun EditAssetScreen(
                 ) {
                     Text(stringResource(R.string.btn_delete))
                 }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownField(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
             }
         }
     }

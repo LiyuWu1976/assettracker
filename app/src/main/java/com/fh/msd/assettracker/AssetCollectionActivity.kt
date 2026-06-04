@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,11 +58,18 @@ fun AssetCollectionScreen(viewModel: AssetViewModel = viewModel()) {
     val context = LocalContext.current
     val assets by viewModel.assets.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    val categories = listOf("All", "Lenses", "Boards", "Cables", "Software")
+    val categories = listOf("All", "Phone", "Camera", "Laptop", "Lens", "Board", "Cable", "Software")
     var selectedCategory by remember { mutableStateOf("All") }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAssets()
+    // Derived state for filtered assets
+    val filteredAssets by remember {
+        derivedStateOf {
+            assets.filter { asset ->
+                val matchesCategory = if (selectedCategory == "All") true else asset.category == selectedCategory
+                val matchesSearch = if (searchQuery.isEmpty()) true else asset.name.contains(searchQuery, ignoreCase = true)
+                matchesCategory && matchesSearch
+            }
+        }
     }
 
     Scaffold(
@@ -141,13 +150,13 @@ fun AssetCollectionScreen(viewModel: AssetViewModel = viewModel()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Asset List
-            if (assets.isEmpty()) {
+            if (filteredAssets.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.no_assets_msg),
+                        text = if (assets.isEmpty()) stringResource(R.string.no_assets_msg) else "No assets match your filters",
                         fontSize = 18.sp,
                         color = Color.Gray
                     )
@@ -157,7 +166,7 @@ fun AssetCollectionScreen(viewModel: AssetViewModel = viewModel()) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(assets) { asset ->
+                    items(filteredAssets) { asset ->
                         AssetCard(asset, onEdit = {
                             val intent = Intent(context, EditAssetActivity::class.java).apply {
                                 putExtra("ASSET_ID", asset.id)
@@ -178,6 +187,12 @@ fun AssetCollectionScreen(viewModel: AssetViewModel = viewModel()) {
 
 @Composable
 fun AssetCard(asset: Asset, onEdit: () -> Unit) {
+    val context = LocalContext.current
+    val categoryIcon = remember(asset.category) {
+        val name = asset.category.lowercase().trim()
+        context.resources.getIdentifier(name, "drawable", context.packageName)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,25 +207,28 @@ fun AssetCard(asset: Asset, onEdit: () -> Unit) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Image Placeholder
+            // Category Icon or Placeholder
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .background(Teal200, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = Color.DarkGray
+                if (categoryIcon != 0) {
+                    Image(
+                        painter = painterResource(id = categoryIcon),
+                        contentDescription = asset.category,
+                        modifier = Modifier.size(100.dp)
                     )
-                    Text(
-                        stringResource(R.string.image_placeholder),
-                        fontSize = 12.sp,
-                        color = Color.DarkGray
-                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Image,
+                            contentDescription = null,
+                            modifier = Modifier.size(100.dp),
+                            tint = Color.DarkGray
+                        )
+                    }
                 }
             }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- EDIT TEXT-->
+    <dimen name="et_padding">16dp</dimen>
+    <dimen name="et_textsize">16sp</dimen>
+
+    <!-- TEXT VIEW -->
+    <dimen name="tv_padding">5dp</dimen>
+    <dimen name="tv_textsize">16sp</dimen>
+    <dimen name="tv_login_donthaveaccount_margintop">64dp</dimen>
+    <dimen name="tv_login_forgotpassword_margintop">16dp</dimen>
+    <dimen name="tv_title_margintop">32dp</dimen>
+    <dimen name="tv_header_textsize">20sp</dimen>
+
+    <!-- BUTTON -->
+    <dimen name="btn_margin">16dp</dimen>
+    <dimen name="btn_padding">8dp</dimen>
+    <dimen name="btn_textsize">18sp</dimen>
+
+    <!-- TEXT INPUT LAYOUT -->
+    <dimen name="til_margin">16dp</dimen>
+
+    <!-- LINEAR LAYOUT -->
+    <dimen name="ll_margintop">64dp</dimen>
+
+    <!-- CHECKBOX -->
+    <dimen name="cb_margintop">16dp</dimen>
+</resources>

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 import com.fh.msd.assettracker.viewmodel.EditAssetViewModel
 
 class EditAssetActivity : ComponentActivity() {
@@ -56,6 +57,7 @@ class EditAssetActivity : ComponentActivity() {
 @Composable
 fun EditAssetScreen(
     viewModel: EditAssetViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel(),
     assetId: String,
     initialName: String,
     initialPrice: Double,
@@ -77,7 +79,8 @@ fun EditAssetScreen(
     var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val categories = listOf("Laptop", "phone", "Board", "Camera", "lens", "Cable", "Software")
+    //val categories = listOf("Laptop", "phone", "Board", "Camera", "lens", "Cable", "Software")
+    val categories by categoryViewModel.categories.collectAsState()
     val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
     val currencies = listOf("EUR", "USD")
 

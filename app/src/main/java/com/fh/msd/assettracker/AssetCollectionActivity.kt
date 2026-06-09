@@ -39,6 +39,7 @@ import com.fh.msd.assettracker.ui.theme.Teal700
 import com.fh.msd.assettracker.ui.theme.Teal200
 import com.fh.msd.assettracker.ui.theme.LightGrey
 import com.fh.msd.assettracker.viewmodel.AssetViewModel
+import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 
 class AssetCollectionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,11 +55,15 @@ class AssetCollectionActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssetCollectionScreen(viewModel: AssetViewModel = viewModel()) {
+fun AssetCollectionScreen(
+    assetViewModel: AssetViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel()
+) {
     val context = LocalContext.current
-    val assets by viewModel.assets.collectAsState()
+    val assets by assetViewModel.assets.collectAsState()
+    val categories by categoryViewModel.categories.collectAsState()
+    
     var searchQuery by remember { mutableStateOf("") }
-    val categories = listOf("All", "Phone", "Camera", "Laptop", "Lens", "Board", "Cable", "Software")
     var selectedCategory by remember { mutableStateOf("All") }
 
     // Derived state for filtered assets

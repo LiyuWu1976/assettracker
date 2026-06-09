@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
 import com.fh.msd.assettracker.viewmodel.AddAssetViewModel
+import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 
 class AddAssetActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +41,11 @@ class AddAssetActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAssetScreen(viewModel: AddAssetViewModel = viewModel(), onBack: () -> Unit) {
+fun AddAssetScreen(
+    viewModel: AddAssetViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel(),
+    onBack: () -> Unit
+) {
     val context = LocalContext.current
     val saveSuccess by viewModel.saveSuccess.collectAsState()
 
@@ -50,7 +55,8 @@ fun AddAssetScreen(viewModel: AddAssetViewModel = viewModel(), onBack: () -> Uni
     var status by remember { mutableStateOf("In Use") }
     var currency by remember { mutableStateOf("EUR") }
 
-    val categories = listOf("Laptop", "Phone", "Board", "Camera", "lens", "Cable", "Software")
+    val categories by categoryViewModel.categories.collectAsState()
+    //val categories = listOf("Laptop", "Phone", "Board", "Camera", "lens", "Cable", "Software")
     val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
     val currencies = listOf("EUR", "USD")
 

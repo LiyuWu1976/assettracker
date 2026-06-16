@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,6 +27,8 @@ import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
 import com.fh.msd.assettracker.viewmodel.AddAssetViewModel
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddAssetActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +57,11 @@ fun AddAssetScreen(
     var category by remember { mutableStateOf("Laptop") }
     var status by remember { mutableStateOf("In Use") }
     var currency by remember { mutableStateOf("EUR") }
+    var warrantyExpiry by remember { mutableStateOf<Long?>(null) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState()
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
     val categories by categoryViewModel.categories.collectAsState()
     //val categories = listOf("Laptop", "Phone", "Board", "Camera", "lens", "Cable", "Software")
@@ -123,6 +131,43 @@ fun AddAssetScreen(
                 onOptionSelected = { status = it }
             )
 
+            OutlinedTextField(
+                value = warrantyExpiry?.let { dateFormatter.format(Date(it)) } ?: "",
+                onValueChange = { },
+                label = { Text("Warranty Expiry") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Select Date"
+                        )
+                    }
+                }
+            )
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            warrantyExpiry = datePickerState.selectedDateMillis
+                            showDatePicker = false
+                        }) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             Row(
@@ -138,7 +183,7 @@ fun AddAssetScreen(
                 Button(
                     onClick = {
                         val priceValue = price.toDoubleOrNull() ?: 0.0
-                        viewModel.saveAsset(name, category, priceValue, currency, status)
+                        viewModel.saveAsset(name, category, priceValue, currency, status, warrantyExpiry)
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.actionButtonColor))

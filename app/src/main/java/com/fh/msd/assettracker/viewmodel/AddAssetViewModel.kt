@@ -17,7 +17,7 @@ class AddAssetViewModel : ViewModel() {
     private val _saveSuccess = MutableStateFlow<Boolean?>(null)
     val saveSuccess = _saveSuccess.asStateFlow()
 
-    fun saveAsset(name: String, category: String, price: Double, currency: String, status: String) {
+    fun saveAsset(name: String, category: String, price: Double, currency: String, status: String, warrantyExpiry: Long?) {
         val uid = auth.currentUser?.uid ?: return
         
         val asset = hashMapOf(
@@ -26,7 +26,8 @@ class AddAssetViewModel : ViewModel() {
             "price" to price,
             "currency" to currency,
             "status" to status,
-            "location" to "" // Added field as per latest structure
+            "location" to "", // Added field as per latest structure
+            "warrantyExpiry" to if (warrantyExpiry != null) java.util.Date(warrantyExpiry) else null
         )
 
         viewModelScope.launch {

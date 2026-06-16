@@ -180,6 +180,9 @@ fun AssetCollectionScreen(
                                 putExtra("ASSET_CATEGORY", asset.category)
                                 putExtra("ASSET_STATUS", asset.status)
                                 putExtra("ASSET_CURRENCY", asset.currency)
+                                asset.warrantyExpiry?.let {
+                                    putExtra("ASSET_WARRANTY_EXPIRY", it.time)
+                                }
                             }
                             context.startActivity(intent)
                         })

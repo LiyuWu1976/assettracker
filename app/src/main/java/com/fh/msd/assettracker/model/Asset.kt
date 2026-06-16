@@ -1,6 +1,7 @@
 package com.fh.msd.assettracker.model
 
 import com.google.firebase.firestore.DocumentId
+import java.util.Date
 
 data class Asset(
     @DocumentId val id: String = "",
@@ -10,5 +11,6 @@ data class Asset(
     val price: Double = 0.0,
     val currency: String = "EUR",
     val status: String = "",
-    val imageUrl: String? = null // For future use if images are added
+    val imageUrl: String? = null, // For future use if images are added
+    val warrantyExpiry: Date? = null
 )

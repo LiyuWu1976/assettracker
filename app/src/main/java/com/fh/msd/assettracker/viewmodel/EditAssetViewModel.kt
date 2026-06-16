@@ -20,7 +20,7 @@ class EditAssetViewModel : ViewModel() {
     private val _deleteSuccess = MutableStateFlow<Boolean?>(null)
     val deleteSuccess = _deleteSuccess.asStateFlow()
 
-    fun updateAsset(id: String, name: String, category: String, price: Double, currency: String, status: String) {
+    fun updateAsset(id: String, name: String, category: String, price: Double, currency: String, status: String, warrantyExpiry: Long?) {
         val uid = auth.currentUser?.uid ?: return
         
         val updates = hashMapOf<String, Any>(
@@ -28,7 +28,8 @@ class EditAssetViewModel : ViewModel() {
             "category" to category,
             "price" to price,
             "currency" to currency,
-            "status" to status
+            "status" to status,
+            "warrantyExpiry" to if (warrantyExpiry != null) java.util.Date(warrantyExpiry) else com.google.firebase.firestore.FieldValue.delete()
         )
 
         viewModelScope.launch {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,6 +25,8 @@ import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 import com.fh.msd.assettracker.viewmodel.EditAssetViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditAssetActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +39,9 @@ class EditAssetActivity : ComponentActivity() {
         val assetCategory = intent.getStringExtra("ASSET_CATEGORY") ?: "Laptop"
         val assetStatus = intent.getStringExtra("ASSET_STATUS") ?: "In Use"
         val assetCurrency = intent.getStringExtra("ASSET_CURRENCY") ?: "EUR"
+        val assetWarrantyExpiry = if (intent.hasExtra("ASSET_WARRANTY_EXPIRY")) {
+            intent.getLongExtra("ASSET_WARRANTY_EXPIRY", -1L).takeIf { it != -1L }
+        } else null
 
         setContent {
             AssetTrackerTheme {
@@ -46,6 +52,7 @@ class EditAssetActivity : ComponentActivity() {
                     initialCategory = assetCategory,
                     initialStatus = assetStatus,
                     initialCurrency = assetCurrency,
+                    initialWarrantyExpiry = assetWarrantyExpiry,
                     onBack = { finish() }
                 )
             }
@@ -64,6 +71,7 @@ fun EditAssetScreen(
     initialCategory: String,
     initialStatus: String,
     initialCurrency: String,
+    initialWarrantyExpiry: Long?,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -75,6 +83,11 @@ fun EditAssetScreen(
     var category by remember { mutableStateOf(initialCategory) }
     var status by remember { mutableStateOf(initialStatus) }
     var currency by remember { mutableStateOf(initialCurrency) }
+    var warrantyExpiry by remember { mutableStateOf(initialWarrantyExpiry) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialWarrantyExpiry)
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
     var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -152,7 +165,7 @@ fun EditAssetScreen(
                 title = { Text(stringResource(R.string.edit_asset_title)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency) {
+                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency || warrantyExpiry != initialWarrantyExpiry) {
                             showCancelDialog = true
                         } else {
                             onBack()
@@ -205,12 +218,49 @@ fun EditAssetScreen(
                 onOptionSelected = { status = it }
             )
 
+            OutlinedTextField(
+                value = warrantyExpiry?.let { dateFormatter.format(Date(it)) } ?: "",
+                onValueChange = { },
+                label = { Text("Warranty Expiry") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Select Date"
+                        )
+                    }
+                }
+            )
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            warrantyExpiry = datePickerState.selectedDateMillis
+                            showDatePicker = false
+                        }) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
                     val priceValue = price.toDoubleOrNull() ?: 0.0
-                    viewModel.updateAsset(assetId, name, category, priceValue, currency, status)
+                    viewModel.updateAsset(assetId, name, category, priceValue, currency, status, warrantyExpiry)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.actionButtonColor))
@@ -224,7 +274,7 @@ fun EditAssetScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency) {
+                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency || warrantyExpiry != initialWarrantyExpiry) {
                             showCancelDialog = true
                         } else {
                             onBack()

@@ -1,9 +1,5 @@
-package com.fh.msd.assettracker
+package com.fh.msd.assettracker.screen
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
@@ -22,10 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.ui.platform.LocalContext
-import android.content.Intent
-import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,31 +27,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.fh.msd.assettracker.R
 import com.fh.msd.assettracker.model.Asset
-import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
-import com.fh.msd.assettracker.ui.theme.Teal700
-import com.fh.msd.assettracker.ui.theme.Teal200
-import com.fh.msd.assettracker.ui.theme.LightGrey
+import com.fh.msd.assettracker.ui.theme.*
 import com.fh.msd.assettracker.viewmodel.AssetViewModel
+import com.fh.msd.assettracker.viewmodel.AuthViewModel
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
-
-class AssetCollectionActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            AssetTrackerTheme {
-                AssetCollectionScreen()
-            }
-        }
-    }
-}
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetCollectionScreen(
+    navController: NavController,
     assetViewModel: AssetViewModel = viewModel(),
-    categoryViewModel: CategoryViewModel = viewModel()
+    categoryViewModel: CategoryViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val assets by assetViewModel.assets.collectAsState()
@@ -83,12 +69,12 @@ fun AssetCollectionScreen(
                 title = { Text(stringResource(R.string.asset_collection_title)) },
                 actions = {
                     IconButton(onClick = {
-                        FirebaseAuth.getInstance().signOut()
-                        val intent = Intent(context, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        context.startActivity(intent)
+                        authViewModel.logout()
+                        navController.navigate("login") {
+                            popUpTo(0)
+                        }
                     }) {
-                        Icon(Icons.Default.Logout, contentDescription = "Logout")
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")
                     }
                 }
             )
@@ -96,8 +82,7 @@ fun AssetCollectionScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    val intent = Intent(context, AddAssetActivity::class.java)
-                    context.startActivity(intent)
+                    navController.navigate("add_asset")
                 },
                 containerColor = Teal700,
                 contentColor = Color.White,
@@ -138,7 +123,8 @@ fun AssetCollectionScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(categories) { category ->
+                val categoriesWithAll = listOf("All") + categories
+                items(categoriesWithAll) { category ->
                     FilterChip(
                         selected = selectedCategory == category,
                         onClick = { selectedCategory = category },
@@ -173,18 +159,8 @@ fun AssetCollectionScreen(
                 ) {
                     items(filteredAssets) { asset ->
                         AssetCard(asset, onEdit = {
-                            val intent = Intent(context, EditAssetActivity::class.java).apply {
-                                putExtra("ASSET_ID", asset.id)
-                                putExtra("ASSET_NAME", asset.name)
-                                putExtra("ASSET_PRICE", asset.price)
-                                putExtra("ASSET_CATEGORY", asset.category)
-                                putExtra("ASSET_STATUS", asset.status)
-                                putExtra("ASSET_CURRENCY", asset.currency)
-                                asset.warrantyExpiry?.let {
-                                    putExtra("ASSET_WARRANTY_EXPIRY", it.time)
-                                }
-                            }
-                            context.startActivity(intent)
+                            val warrantyTime = asset.warrantyExpiry?.time ?: -1L
+                            navController.navigate("edit_asset/${asset.id}/${asset.name}/${asset.price}/${asset.category}/${asset.status}/${asset.currency}/$warrantyTime")
                         })
                     }
                 }
@@ -281,4 +257,10 @@ fun AssetCard(asset: Asset, onEdit: () -> Unit) {
     }
 }
 
-
+@Preview(showBackground = true)
+@Composable
+fun AssetCollectionPreview() {
+    AssetTrackerTheme {
+        AssetCollectionScreen(navController = rememberNavController())
+    }
+}

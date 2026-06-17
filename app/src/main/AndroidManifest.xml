@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,24 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AssetTracker">
         <activity
-            android:name=".AssetCollectionActivity"
-            android:exported="false"
-            android:label="@string/asset_collection_title"
-            android:theme="@style/Theme.AssetTracker" />
-        <activity
-            android:name=".AddAssetActivity"
-            android:exported="false"
-            android:label="@string/add_asset_title"
-            android:theme="@style/Theme.AssetTracker" />
-        <activity
-            android:name=".EditAssetActivity"
-            android:exported="false"
-            android:label="@string/edit_asset_title"
-            android:theme="@style/Theme.AssetTracker" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.AssetTracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

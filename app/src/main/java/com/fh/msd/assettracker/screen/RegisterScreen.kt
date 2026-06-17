@@ -1,21 +1,15 @@
-package com.fh.msd.assettracker
+package com.fh.msd.assettracker.screen
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,13 +18,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import com.fh.msd.assettracker.composables.ActionButton
-import com.fh.msd.assettracker.composables.EditText
-import com.fh.msd.assettracker.composables.Header
-import com.fh.msd.assettracker.composables.IconData
-import com.fh.msd.assettracker.composables.PasswordText
-import com.fh.msd.assettracker.composables.SecondaryButton
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.fh.msd.assettracker.R
+import com.fh.msd.assettracker.composables.*
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.viewmodel.AuthViewModel
 
 private data class RegisterInput(
     val text: String,
@@ -41,10 +36,9 @@ private data class RegisterInput(
 )
 
 @Composable
-fun RegisterPage(
-    modifier: Modifier = Modifier, toLogin: () -> Unit, toastMessage: String?, register: (
-        firstName: String, lastName: String, email: String, password: String, confirmPassword: String, agreeTermsAndConditions: Boolean
-    ) -> Unit, back: () -> Unit
+fun RegisterScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel()
 ) {
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
@@ -53,6 +47,7 @@ fun RegisterPage(
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var agreeTermsAndConditions by rememberSaveable { mutableStateOf(false) }
 
+    val toastMessage by authViewModel.toastMessage.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(toastMessage) {
@@ -97,8 +92,13 @@ fun RegisterPage(
         ),
     )
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Header(back, stringResource(R.string.tv_register_header_text))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Header({ navController.popBackStack() }, stringResource(R.string.tv_register_header_text))
         inputs.forEach {
             if (it.isPassword) {
                 PasswordText(
@@ -136,23 +136,22 @@ fun RegisterPage(
 
         ActionButton(
             {
-                register(
+                authViewModel.register(
                     firstName, lastName, email, password, confirmPassword, agreeTermsAndConditions
                 )
-            }, stringResource(R.string.btn_register_register_text)
+            },
+            stringResource(R.string.btn_register_register_text)
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(
-                dimensionResource(R.dimen.tv_padding)
-            ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.tv_padding)),
         ) {
             Text(stringResource(R.string.tv_register_alreadyhaveanaccount_text))
             SecondaryButton(
-                toLogin, stringResource(R.string.tv_register_login_text), Modifier.align(
-                    Alignment.CenterVertically
-                )
+                { navController.navigate("login") { popUpTo("login") { inclusive = true } } },
+                stringResource(R.string.tv_register_login_text),
+                Modifier.align(Alignment.CenterVertically)
             )
         }
     }
@@ -160,13 +159,8 @@ fun RegisterPage(
 
 @Preview(showBackground = true)
 @Composable
-fun RegisterPagePreview() {
+fun RegisterScreenPreview() {
     AssetTrackerTheme {
-        RegisterPage(
-            toLogin = {},
-            toastMessage = null,
-            register = { _, _, _, _, _, _ -> },
-            back = {}
-        )
+        RegisterScreen(navController = rememberNavController())
     }
 }

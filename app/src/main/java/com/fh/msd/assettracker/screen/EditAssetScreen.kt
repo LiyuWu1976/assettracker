@@ -1,16 +1,12 @@
-package com.fh.msd.assettracker
+package com.fh.msd.assettracker.screen
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,8 +15,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.fh.msd.assettracker.R
 import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
@@ -28,43 +28,10 @@ import com.fh.msd.assettracker.viewmodel.EditAssetViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EditAssetActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        
-        val assetId = intent.getStringExtra("ASSET_ID") ?: ""
-        val assetName = intent.getStringExtra("ASSET_NAME") ?: ""
-        val assetPrice = intent.getDoubleExtra("ASSET_PRICE", 0.0)
-        val assetCategory = intent.getStringExtra("ASSET_CATEGORY") ?: "Laptop"
-        val assetStatus = intent.getStringExtra("ASSET_STATUS") ?: "In Use"
-        val assetCurrency = intent.getStringExtra("ASSET_CURRENCY") ?: "EUR"
-        val assetWarrantyExpiry = if (intent.hasExtra("ASSET_WARRANTY_EXPIRY")) {
-            intent.getLongExtra("ASSET_WARRANTY_EXPIRY", -1L).takeIf { it != -1L }
-        } else null
-
-        setContent {
-            AssetTrackerTheme {
-                EditAssetScreen(
-                    assetId = assetId,
-                    initialName = assetName,
-                    initialPrice = assetPrice,
-                    initialCategory = assetCategory,
-                    initialStatus = assetStatus,
-                    initialCurrency = assetCurrency,
-                    initialWarrantyExpiry = assetWarrantyExpiry,
-                    onBack = { finish() }
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAssetScreen(
-    viewModel: EditAssetViewModel = viewModel(),
-    categoryViewModel: CategoryViewModel = viewModel(),
+    navController: NavController,
     assetId: String,
     initialName: String,
     initialPrice: Double,
@@ -72,7 +39,8 @@ fun EditAssetScreen(
     initialStatus: String,
     initialCurrency: String,
     initialWarrantyExpiry: Long?,
-    onBack: () -> Unit
+    viewModel: EditAssetViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val updateSuccess by viewModel.updateSuccess.collectAsState()
@@ -92,27 +60,38 @@ fun EditAssetScreen(
     var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    //val categories = listOf("Laptop", "phone", "Board", "Camera", "lens", "Cable", "Software")
     val categories by categoryViewModel.categories.collectAsState()
     val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
     val currencies = listOf("EUR", "USD")
 
+    val isModified = name != initialName || 
+                     price != initialPrice.toString() || 
+                     category != initialCategory || 
+                     status != initialStatus || 
+                     currency != initialCurrency ||
+                     warrantyExpiry != initialWarrantyExpiry
+
+    val msgAssetUpdated = stringResource(R.string.msg_asset_updated)
+    val errUpdateFailed = stringResource(R.string.err_update_failed)
+    val msgAssetDeleted = stringResource(R.string.msg_asset_deleted)
+    val errDeleteFailed = stringResource(R.string.err_delete_failed)
+
     LaunchedEffect(updateSuccess) {
         if (updateSuccess == true) {
-            Toast.makeText(context, context.getString(R.string.msg_asset_updated), Toast.LENGTH_SHORT).show()
-            onBack()
+            Toast.makeText(context, msgAssetUpdated, Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
         } else if (updateSuccess == false) {
-            Toast.makeText(context, context.getString(R.string.err_update_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, errUpdateFailed, Toast.LENGTH_SHORT).show()
             viewModel.resetStates()
         }
     }
 
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess == true) {
-            Toast.makeText(context, context.getString(R.string.msg_asset_deleted), Toast.LENGTH_SHORT).show()
-            onBack()
+            Toast.makeText(context, msgAssetDeleted, Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
         } else if (deleteSuccess == false) {
-            Toast.makeText(context, context.getString(R.string.err_delete_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, errDeleteFailed, Toast.LENGTH_SHORT).show()
             viewModel.resetStates()
         }
     }
@@ -125,7 +104,7 @@ fun EditAssetScreen(
             confirmButton = {
                 TextButton(onClick = { 
                     showCancelDialog = false
-                    onBack()
+                    navController.popBackStack()
                 }) {
                     Text(stringResource(R.string.btn_yes))
                 }
@@ -165,13 +144,13 @@ fun EditAssetScreen(
                 title = { Text(stringResource(R.string.edit_asset_title)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency || warrantyExpiry != initialWarrantyExpiry) {
+                        if (isModified) {
                             showCancelDialog = true
                         } else {
-                            onBack()
+                            navController.popBackStack()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -274,10 +253,10 @@ fun EditAssetScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        if (name != initialName || price != initialPrice.toString() || category != initialCategory || status != initialStatus || currency != initialCurrency || warrantyExpiry != initialWarrantyExpiry) {
+                        if (isModified) {
                             showCancelDialog = true
                         } else {
-                            onBack()
+                            navController.popBackStack()
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -293,5 +272,22 @@ fun EditAssetScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditAssetPreview() {
+    AssetTrackerTheme {
+        EditAssetScreen(
+            navController = rememberNavController(),
+            assetId = "1",
+            initialName = "MacBook Pro",
+            initialPrice = 2500.0,
+            initialCategory = "Laptop",
+            initialStatus = "In Use",
+            initialCurrency = "EUR",
+            initialWarrantyExpiry = 1735689600000L
+        )
     }
 }

@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">AssetTracker</string>
+
+    <!-- LOGIN SCREEN -->
+    <string name="tv_login_title_text">Willkommen!</string>
+    <string name="tv_login_donthaveaccount_text">Noch kein Konto?</string>
+    <string name="tv_login_register_text"><u>Registrieren</u></string>
+    <string name="tv_login_forgotpassword_text"><u>Passwort vergessen?</u></string>
+    <string name="et_login_email_hint">E-Mail</string>
+    <string name="et_login_password_hint">Passwort</string>
+    <string name="btn_login_login_text">Anmelden</string>
+
+    <!-- REGISTER SCREEN -->
+    <string name="tv_register_header_text">KONTO ERSTELLEN</string>
+    <string name="tv_register_alreadyhaveanaccount_text">Bereits ein Konto?</string>
+    <string name="tv_register_login_text"><u>Anmelden</u></string>
+    <string name="til_register_firstname_hint">Vorname</string>
+    <string name="til_register_lastname_hint">Nachname</string>
+    <string name="til_register_confirmpassword_hint">Passwort bestätigen</string>
+    <string name="cb_register_termsandcondition_text">Ich stimme den <u>AGB</u> zu</string>
+    <string name="btn_register_register_text">Registrieren</string>
+
+    <!-- FORGOT-PASSWORD SCREEN -->
+    <string name="tv_forgotpassword_description_text">Geben Sie Ihre E-Mail-Adresse ein, um Ihr Passwort zurückzusetzen</string>
+    <string name="btn_forgotpassword_submit_text">E-MAIL SENDEN</string>
+    <string name="tv_forgotpassword_header_text">PASSWORT VERGESSEN?</string>
+
+    <!-- AUTH MESSAGES -->
+    <string name="err_invalid_values">Ungültige Werte</string>
+    <string name="msg_login_success">Erfolgreich angemeldet</string>
+    <string name="err_login_unknown">Unbekannter Login-Fehler</string>
+    <string name="err_password_short">Passwort ist zu kurz, mindestens 6 Zeichen</string>
+    <string name="err_password_mismatch">Passwörter stimmen nicht überein</string>
+    <string name="err_accept_terms">Bitte akzeptieren Sie die AGB!</string>
+    <string name="err_fill_all_fields">Ungültige Werte, bitte alle Felder ausfüllen</string>
+    <string name="msg_register_success">Konto erfolgreich erstellt</string>
+    <string name="err_register_unknown">Unbekannter Registrierungsfehler</string>
+    <string name="err_provide_email">Bitte geben Sie eine E-Mail an</string>
+    <string name="msg_forgot_password_success">Überprüfen Sie Ihr Postfach, um Ihr Passwort zurückzusetzen</string>
+    <string name="err_forgot_password_unknown">Fehler beim Senden der Rücksetz-E-Mail</string>
+
+    <!-- ASSET COLLECTION -->
+    <string name="asset_collection_title">Meine Assets</string>
+    <string name="search_hint">Schnellsuche</string>
+    <string name="edit_button">BEARBEITEN</string>
+    <string name="image_placeholder">BILD</string>
+    <string name="no_assets_msg">Sie besitzen kein Vermögen.</string>
+    <string name="no_matches_msg">Keine Objekte entsprechen Ihren Filtern.</string>
+    <string name="cat_all">Alle</string>
+
+    <!-- ADD ASSET -->
+    <string name="add_asset_title">Neues Asset hinzufügen</string>
+    <string name="asset_name">Asset-Name</string>
+    <string name="asset_price">Preis</string>
+    <string name="asset_category">Kategorie</string>
+    <string name="asset_status">Status</string>
+    <string name="asset_currency">Währung</string>
+    <string name="btn_save">Speichern</string>
+    <string name="btn_cancel">Abbrechen</string>
+    <string name="msg_asset_saved">Asset erfolgreich gespeichert</string>
+    <string name="msg_asset_updated">Asset erfolgreich aktualisiert</string>
+    <string name="msg_asset_deleted">Asset erfolgreich gelöscht</string>
+    <string name="err_save_failed">Fehler beim Speichern des Assets</string>
+    <string name="err_update_failed">Fehler beim Aktualisieren des Assets</string>
+    <string name="err_delete_failed">Fehler beim Löschen des Assets</string>
+
+    <!-- EDIT ASSET -->
+    <string name="edit_asset_title">Asset bearbeiten</string>
+    <string name="asset_warranty_expiry">Garantieende</string>
+    <string name="btn_delete">Löschen</string>
+    <string name="confirm_cancel_title">Änderungen verwerfen?</string>
+    <string name="confirm_cancel_msg">Sind Sie sicher, dass Sie die Änderungen verwerfen möchten?</string>
+    <string name="confirm_delete_title">Asset löschen?</string>
+    <string name="confirm_delete_msg">Sind Sie sicher, dass Sie dieses Asset löschen möchten? Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
+    <string name="btn_yes">Ja</string>
+    <string name="btn_no">Nein</string>
+</resources>

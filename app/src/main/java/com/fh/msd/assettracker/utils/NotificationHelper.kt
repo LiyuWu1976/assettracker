@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 
 class NotificationHelper(private val context: Context) {
     private val channelId = "warranty_expiry_channel"
-    private val channelName = "Warranty Expiry Notifications"
+    private val channelName = context.getString(com.fh.msd.assettracker.R.string.notif_channel_name)
 
     init {
         createNotificationChannel()
@@ -23,7 +23,7 @@ class NotificationHelper(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(channelId, channelName, importance).apply {
-                description = "Notifications for assets with expiring warranties"
+                description = context.getString(com.fh.msd.assettracker.R.string.notif_channel_desc)
             }
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -40,9 +40,9 @@ class NotificationHelper(private val context: Context) {
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_dialog_info)
-            .setContentTitle("Warranty Expiry Soon")
-            .setContentText("The warranty for '$assetName' will expire in 1 day.")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(context.getString(com.fh.msd.assettracker.R.string.notif_title_warranty_expiry))
+            .setContentText(context.getString(com.fh.msd.assettracker.R.string.notif_msg_warranty_expiry, assetName))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
 

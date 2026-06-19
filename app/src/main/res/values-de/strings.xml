@@ -15,7 +15,7 @@
     <string name="tv_register_alreadyhaveanaccount_text">Bereits ein Konto?</string>
     <string name="tv_register_login_text"><u>Anmelden</u></string>
     <string name="til_register_firstname_hint">Vorname</string>
-    <string name="til_register_lastname_hint">Nachname</string>
+    <string name="til_register_lastname_hint">Last name</string>
     <string name="til_register_confirmpassword_hint">Passwort bestätigen</string>
     <string name="cb_register_termsandcondition_text">Ich stimme den <u>AGB</u> zu</string>
     <string name="btn_register_register_text">Registrieren</string>
@@ -74,4 +74,53 @@
     <string name="confirm_delete_msg">Sind Sie sicher, dass Sie dieses Asset löschen möchten? Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
+
+    <!-- MENU & SETTINGS -->
+    <string name="menu_setup">Einstellungen</string>
+    <string name="menu_night_mode">Nachtmodus</string>
+    <string name="menu_day_mode">Tagmodus</string>
+    <string name="menu_language">Sprache</string>
+    <string name="dialog_select_language">Sprache auswählen</string>
+    <string name="lang_en">Englisch</string>
+    <string name="lang_de">Deutsch</string>
+
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="logout_desc">Abmelden</string>
+    <string name="add_asset_desc">Asset hinzufügen</string>
+    <string name="logo_desc">Logo</string>
+    <string name="email_icon_desc">E-Mail-Symbol</string>
+    <string name="person_icon_desc">Personen-Symbol</string>
+    <string name="back_desc">Zurück</string>
+    <string name="select_date_desc">Datum auswählen</string>
+    <string name="hide_password_desc">Passwort verbergen</string>
+    <string name="show_password_desc">Passwort anzeigen</string>
+
+    <!-- COMMON BUTTONS -->
+    <string name="btn_ok">OK</string>
+
+    <!-- CATEGORIES -->
+    <string name="cat_phone">Telefon</string>
+    <string name="cat_camera">Kamera</string>
+    <string name="cat_laptop">Laptop</string>
+    <string name="cat_lens">Objektiv</string>
+    <string name="cat_board">Board</string>
+    <string name="cat_cable">Kabel</string>
+    <string name="cat_software">Software</string>
+
+    <!-- STATUSES -->
+    <string name="status_on_shelf">Im Regal</string>
+    <string name="status_in_use">In Benutzung</string>
+    <string name="status_loaned">Ausgeliehen</string>
+    <string name="status_maintaining">Wartung</string>
+    <string name="status_lost_retired">Verloren/Ausgemustert</string>
+
+    <!-- CURRENCIES -->
+    <string name="currency_eur">EUR</string>
+    <string name="currency_usd">USD</string>
+
+    <!-- NOTIFICATIONS -->
+    <string name="notif_channel_name">Garantie-Ablauf-Benachrichtigungen</string>
+    <string name="notif_channel_desc">Benachrichtigungen für Assets mit auslaufender Garantie</string>
+    <string name="notif_title_warranty_expiry">Garantie läuft bald ab</string>
+    <string name="notif_msg_warranty_expiry">Die Garantie für \'%1$s\' läuft in 1 Tag ab.</string>
 </resources>

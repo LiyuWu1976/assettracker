@@ -51,7 +51,7 @@ fun LoginScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.header),
-            contentDescription = "Logo",
+            contentDescription = stringResource(R.string.logo_desc),
         )
         Text(
             text = stringResource(R.string.tv_login_title_text),
@@ -67,7 +67,7 @@ fun LoginScreen(
             { email = it },
             dimensionResource(R.dimen.et_padding),
             stringResource(R.string.et_login_email_hint),
-            IconData(Icons.Filled.Email, "Email Icon")
+            IconData(Icons.Filled.Email, stringResource(R.string.email_icon_desc))
         )
 
         PasswordText(

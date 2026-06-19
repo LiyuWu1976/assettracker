@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.fh.msd.assettracker.R
 import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.ui.theme.BrandTeal
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 import com.fh.msd.assettracker.viewmodel.EditAssetViewModel
 import java.text.SimpleDateFormat
@@ -61,8 +62,17 @@ fun EditAssetScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val categories by categoryViewModel.categories.collectAsState()
-    val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
-    val currencies = listOf("EUR", "USD")
+    val statuses = listOf(
+        stringResource(R.string.status_on_shelf),
+        stringResource(R.string.status_in_use),
+        stringResource(R.string.status_loaned),
+        stringResource(R.string.status_maintaining),
+        stringResource(R.string.status_lost_retired)
+    )
+    val currencies = listOf(
+        stringResource(R.string.currency_eur),
+        stringResource(R.string.currency_usd)
+    )
 
     val isModified = name != initialName || 
                      price != initialPrice.toString() || 
@@ -150,7 +160,7 @@ fun EditAssetScreen(
                             navController.popBackStack()
                         }
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 }
             )
@@ -200,14 +210,14 @@ fun EditAssetScreen(
             OutlinedTextField(
                 value = warrantyExpiry?.let { dateFormatter.format(Date(it)) } ?: "",
                 onValueChange = { },
-                label = { Text("Warranty Expiry") },
+                label = { Text(stringResource(R.string.asset_warranty_expiry)) },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "Select Date"
+                            contentDescription = stringResource(R.string.select_date_desc)
                         )
                     }
                 }
@@ -221,12 +231,12 @@ fun EditAssetScreen(
                             warrantyExpiry = datePickerState.selectedDateMillis
                             showDatePicker = false
                         }) {
-                            Text("OK")
+                            Text(stringResource(R.string.btn_ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDatePicker = false }) {
-                            Text("Cancel")
+                            Text(stringResource(R.string.btn_cancel))
                         }
                     }
                 ) {
@@ -242,7 +252,7 @@ fun EditAssetScreen(
                     viewModel.updateAsset(assetId, name, category, priceValue, currency, status, warrantyExpiry)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.actionButtonColor))
+                colors = ButtonDefaults.buttonColors(containerColor = BrandTeal)
             ) {
                 Text(stringResource(R.string.btn_save))
             }

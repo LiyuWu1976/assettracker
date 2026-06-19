@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.fh.msd.assettracker.R
 import kotlinx.coroutines.delay
@@ -47,7 +48,7 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo",
+            contentDescription = stringResource(R.string.logo_desc),
             modifier = Modifier
                 .width(logoWidth)
                 .alpha(alpha.value),

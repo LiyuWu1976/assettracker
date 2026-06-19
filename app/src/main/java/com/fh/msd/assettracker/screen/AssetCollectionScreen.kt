@@ -13,7 +13,10 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +38,9 @@ import com.fh.msd.assettracker.ui.theme.*
 import com.fh.msd.assettracker.viewmodel.AssetViewModel
 import com.fh.msd.assettracker.viewmodel.AuthViewModel
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
+import com.fh.msd.assettracker.viewmodel.SettingsViewModel
 import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,24 +48,61 @@ fun AssetCollectionScreen(
     navController: NavController,
     assetViewModel: AssetViewModel = viewModel(),
     categoryViewModel: CategoryViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val assets by assetViewModel.assets.collectAsState()
     val categories by categoryViewModel.categories.collectAsState()
+    val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+    val currentLanguage by settingsViewModel.currentLanguage.collectAsState()
+
+    var showMenu by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
     
     var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("All") }
+    val allCategoryLabel = stringResource(R.string.cat_all)
+    var selectedCategory by remember { mutableStateOf(allCategoryLabel) }
 
     // Derived state for filtered assets
     val filteredAssets by remember {
         derivedStateOf {
             assets.filter { asset ->
-                val matchesCategory = if (selectedCategory == "All") true else asset.category == selectedCategory
+                val matchesCategory = if (selectedCategory == allCategoryLabel) true else asset.category == selectedCategory
                 val matchesSearch = if (searchQuery.isEmpty()) true else asset.name.contains(searchQuery, ignoreCase = true)
                 matchesCategory && matchesSearch
             }
         }
+    }
+
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(stringResource(R.string.dialog_select_language)) },
+            text = {
+                Column {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.lang_en)) },
+                        onClick = {
+                            settingsViewModel.changeLanguage("en")
+                            showLanguageDialog = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.lang_de)) },
+                        onClick = {
+                            settingsViewModel.changeLanguage("de")
+                            showLanguageDialog = false
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -68,13 +110,74 @@ fun AssetCollectionScreen(
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.asset_collection_title)) },
                 actions = {
-                    IconButton(onClick = {
-                        authViewModel.logout()
-                        navController.navigate("login") {
-                            popUpTo(0)
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.menu_setup)
+                            )
                         }
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            // Theme Toggle
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        if (isDarkMode) stringResource(R.string.menu_day_mode)
+                                        else stringResource(R.string.menu_night_mode)
+                                    )
+                                },
+                                onClick = {
+                                    settingsViewModel.toggleTheme()
+                                    showMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        if (isDarkMode) Icons.Default.WbSunny else Icons.Default.Nightlight,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                            
+                            // Language Selection
+                            DropdownMenuItem(
+                                text = {
+                                    Text("${stringResource(R.string.menu_language)}: ${if (currentLanguage == "en") stringResource(R.string.lang_en) else stringResource(R.string.lang_de)}")
+                                },
+                                onClick = {
+                                    showLanguageDialog = true
+                                    showMenu = false
+                                }
+                            )
+                            
+                            HorizontalDivider()
+                            
+                            // Logout
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(R.string.logout_desc),
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                },
+                                onClick = {
+                                    authViewModel.logout()
+                                    navController.navigate("login") {
+                                        popUpTo(0)
+                                    }
+                                    showMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Logout,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             )
@@ -88,7 +191,7 @@ fun AssetCollectionScreen(
                 contentColor = Color.White,
                 shape = RoundedCornerShape(50)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Asset")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_asset_desc))
             }
         }
     ) { innerPadding ->
@@ -109,10 +212,8 @@ fun AssetCollectionScreen(
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = Color.Transparent
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
                 )
             )
 
@@ -123,7 +224,7 @@ fun AssetCollectionScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val categoriesWithAll = listOf("All") + categories
+                val categoriesWithAll = listOf(allCategoryLabel) + categories
                 items(categoriesWithAll) { category ->
                     FilterChip(
                         selected = selectedCategory == category,
@@ -132,7 +233,7 @@ fun AssetCollectionScreen(
                         shape = RoundedCornerShape(20.dp),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = Color.White
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                         )
                     )
                 }
@@ -147,7 +248,7 @@ fun AssetCollectionScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (assets.isEmpty()) stringResource(R.string.no_assets_msg) else "No assets match your filters",
+                        text = if (assets.isEmpty()) stringResource(R.string.no_assets_msg) else stringResource(R.string.no_matches_msg),
                         fontSize = 18.sp,
                         color = Color.Gray
                     )
@@ -182,7 +283,7 @@ fun AssetCard(asset: Asset, onEdit: () -> Unit) {
             .fillMaxWidth()
             .clickable { onEdit() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(

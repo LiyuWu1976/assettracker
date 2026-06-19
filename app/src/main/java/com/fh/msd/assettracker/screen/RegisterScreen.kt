@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.fh.msd.assettracker.R
 import com.fh.msd.assettracker.composables.*
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.ui.theme.BrandTeal
 import com.fh.msd.assettracker.viewmodel.AuthViewModel
 
 private data class RegisterInput(
@@ -62,21 +63,21 @@ fun RegisterScreen(
             { firstName = it },
             stringResource(R.string.til_register_firstname_hint),
             false,
-            IconData(Icons.Filled.Person, "Person Icon")
+            IconData(Icons.Filled.Person, stringResource(R.string.person_icon_desc))
         ),
         RegisterInput(
             lastName,
             { lastName = it },
             stringResource(R.string.til_register_lastname_hint),
             false,
-            IconData(Icons.Filled.Person, "Person Icon")
+            IconData(Icons.Filled.Person, stringResource(R.string.person_icon_desc))
         ),
         RegisterInput(
             email,
             { email = it },
             stringResource(R.string.et_login_email_hint),
             false,
-            IconData(Icons.Filled.Email, "Email Icon")
+            IconData(Icons.Filled.Email, stringResource(R.string.email_icon_desc))
         ),
         RegisterInput(
             password,
@@ -123,8 +124,8 @@ fun RegisterScreen(
                 agreeTermsAndConditions,
                 { agreeTermsAndConditions = it },
                 colors = CheckboxDefaults.colors().copy(
-                    checkedBorderColor = colorResource(R.color.actionButtonColor),
-                    checkedBoxColor = colorResource(R.color.actionButtonColor)
+                    checkedBorderColor = BrandTeal,
+                    checkedBoxColor = BrandTeal
                 )
             )
             Text(stringResource(R.string.cb_register_termsandcondition_text).substring(0, 15))

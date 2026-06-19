@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.fh.msd.assettracker.R
 import com.fh.msd.assettracker.composables.DropdownField
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.ui.theme.BrandTeal
 import com.fh.msd.assettracker.viewmodel.AddAssetViewModel
 import com.fh.msd.assettracker.viewmodel.CategoryViewModel
 import java.text.SimpleDateFormat
@@ -38,11 +39,14 @@ fun AddAssetScreen(
     val context = LocalContext.current
     val saveSuccess by viewModel.saveSuccess.collectAsState()
 
+    val initialStatus = stringResource(R.string.status_in_use)
+    val initialCurrency = stringResource(R.string.currency_eur)
+
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("Laptop") }
-    var status by remember { mutableStateOf("In Use") }
-    var currency by remember { mutableStateOf("EUR") }
+    var category by remember { mutableStateOf("laptop") }
+    var status by remember { mutableStateOf(initialStatus) }
+    var currency by remember { mutableStateOf(initialCurrency) }
     var warrantyExpiry by remember { mutableStateOf<Long?>(null) }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -50,8 +54,17 @@ fun AddAssetScreen(
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
     val categories by categoryViewModel.categories.collectAsState()
-    val statuses = listOf("On Shelf", "In Use", "Loaned", "Maintaining", "Lost/Retired")
-    val currencies = listOf("EUR", "USD")
+    val statuses = listOf(
+        stringResource(R.string.status_on_shelf),
+        stringResource(R.string.status_in_use),
+        stringResource(R.string.status_loaned),
+        stringResource(R.string.status_maintaining),
+        stringResource(R.string.status_lost_retired)
+    )
+    val currencies = listOf(
+        stringResource(R.string.currency_eur),
+        stringResource(R.string.currency_usd)
+    )
 
     val msgAssetSaved = stringResource(R.string.msg_asset_saved)
     val errSaveFailed = stringResource(R.string.err_save_failed)
@@ -72,7 +85,7 @@ fun AddAssetScreen(
                 title = { Text(stringResource(R.string.add_asset_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 }
             )
@@ -126,14 +139,14 @@ fun AddAssetScreen(
                 OutlinedTextField(
                     value = warrantyExpiry?.let { dateFormatter.format(Date(it)) } ?: "",
                     onValueChange = { },
-                    label = { Text("Warranty Expiry") },
+                    label = { Text(stringResource(R.string.asset_warranty_expiry)) },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = "Select Date"
+                                contentDescription = stringResource(R.string.select_date_desc)
                             )
                         }
                     }
@@ -147,12 +160,12 @@ fun AddAssetScreen(
                                 warrantyExpiry = datePickerState.selectedDateMillis
                                 showDatePicker = false
                             }) {
-                                Text("OK")
+                                Text(stringResource(R.string.btn_ok))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showDatePicker = false }) {
-                                Text("Cancel")
+                                Text(stringResource(R.string.btn_cancel))
                             }
                         }
                     ) {
@@ -179,7 +192,7 @@ fun AddAssetScreen(
                         viewModel.saveAsset(name, category, priceValue, currency, status, warrantyExpiry)
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.actionButtonColor))
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandTeal)
                 ) {
                     Text(stringResource(R.string.btn_save))
                 }

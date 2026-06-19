@@ -75,4 +75,53 @@
     <string name="confirm_delete_msg">Are you sure you want to delete this asset? This action cannot be undone.</string>
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>
+
+    <!-- MENU & SETTINGS -->
+    <string name="menu_setup">Setup</string>
+    <string name="menu_night_mode">Night Mode</string>
+    <string name="menu_day_mode">Day Mode</string>
+    <string name="menu_language">Language</string>
+    <string name="dialog_select_language">Select Language</string>
+    <string name="lang_en">English</string>
+    <string name="lang_de">Deutsch</string>
+
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="logout_desc">Logout</string>
+    <string name="add_asset_desc">Add Asset</string>
+    <string name="logo_desc">Logo</string>
+    <string name="email_icon_desc">Email Icon</string>
+    <string name="person_icon_desc">Person Icon</string>
+    <string name="back_desc">Back</string>
+    <string name="select_date_desc">Select Date</string>
+    <string name="hide_password_desc">Hide password</string>
+    <string name="show_password_desc">Show password</string>
+
+    <!-- COMMON BUTTONS -->
+    <string name="btn_ok">OK</string>
+
+    <!-- CATEGORIES -->
+    <string name="cat_phone">Phone</string>
+    <string name="cat_camera">Camera</string>
+    <string name="cat_laptop">Laptop</string>
+    <string name="cat_lens">Lens</string>
+    <string name="cat_board">Board</string>
+    <string name="cat_cable">Cable</string>
+    <string name="cat_software">Software</string>
+
+    <!-- STATUSES -->
+    <string name="status_on_shelf">On Shelf</string>
+    <string name="status_in_use">In Use</string>
+    <string name="status_loaned">Loaned</string>
+    <string name="status_maintaining">Maintaining</string>
+    <string name="status_lost_retired">Lost/Retired</string>
+
+    <!-- CURRENCIES -->
+    <string name="currency_eur">EUR</string>
+    <string name="currency_usd">USD</string>
+
+    <!-- NOTIFICATIONS -->
+    <string name="notif_channel_name">Warranty Expiry Notifications</string>
+    <string name="notif_channel_desc">Notifications for assets with expiring warranties</string>
+    <string name="notif_title_warranty_expiry">Warranty Expiry Soon</string>
+    <string name="notif_msg_warranty_expiry">The warranty for \'%1$s\' will expire in 1 day.</string>
 </resources>

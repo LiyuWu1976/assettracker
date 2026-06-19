@@ -5,12 +5,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,11 +31,13 @@ import androidx.navigation.navArgument
 import androidx.work.*
 import com.fh.msd.assettracker.screen.*
 import com.fh.msd.assettracker.ui.theme.AssetTrackerTheme
+import com.fh.msd.assettracker.utils.LanguageManager
 import com.fh.msd.assettracker.viewmodel.AuthViewModel
+import com.fh.msd.assettracker.viewmodel.SettingsViewModel
 import com.fh.msd.assettracker.worker.WarrantyWorker
 import java.util.concurrent.TimeUnit
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val requestPermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -52,11 +55,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Apply language before setContent
+        val languageManager = LanguageManager(this)
+        languageManager.applyLanguage(this)
+        
         enableEdgeToEdge()
         checkNotificationPermission()
         scheduleWarrantyCheck()
         setContent {
-            AssetTrackerTheme {
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+
+            AssetTrackerTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
@@ -87,8 +98,8 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = Color.White,
-                    contentColor = Color.Black
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -110,7 +121,11 @@ class MainActivity : ComponentActivity() {
                             ForgotPasswordScreen(navController, authViewModel)
                         }
                         composable("collection") {
-                            AssetCollectionScreen(navController, authViewModel = authViewModel)
+                            AssetCollectionScreen(
+                                navController = navController,
+                                authViewModel = authViewModel,
+                                settingsViewModel = settingsViewModel
+                            )
                         }
                         composable("add_asset") {
                             AddAssetScreen(navController)

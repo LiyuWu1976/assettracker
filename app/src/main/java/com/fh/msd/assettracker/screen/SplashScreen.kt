@@ -18,15 +18,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.fh.msd.assettracker.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController, nextRoute: String) {
-    // 1. 底色#17777E
-    // 2. 图标logo.png一开始在中间处于隐身状态，在2s中慢慢显现清晰出来
-    // 3. 图标logo.png 宽占据的大小为屏幕的1/3，不要拉伸此图标，保持宽高比相同
+fun SplashScreen(onAnimationFinished: () -> Unit) {
     
     val alpha = remember { Animatable(0f) }
     val configuration = LocalConfiguration.current
@@ -34,16 +30,13 @@ fun SplashScreen(navController: NavController, nextRoute: String) {
     val logoWidth = screenWidth / 3
 
     LaunchedEffect(key1 = true) {
-        // 2s内慢慢显现
         alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 2000)
         )
-        // 动画结束后停留一小会儿再跳转
+
         delay(500)
-        navController.navigate(nextRoute) {
-            popUpTo("splash") { inclusive = true }
-        }
+        onAnimationFinished()
     }
 
     Box(
@@ -58,7 +51,7 @@ fun SplashScreen(navController: NavController, nextRoute: String) {
             modifier = Modifier
                 .width(logoWidth)
                 .alpha(alpha.value),
-            contentScale = ContentScale.Fit // 保持宽高比，不拉伸
+            contentScale = ContentScale.Fit
         )
     }
 }

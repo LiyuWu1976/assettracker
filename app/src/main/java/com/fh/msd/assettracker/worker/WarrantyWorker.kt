@@ -58,7 +58,7 @@ class WarrantyWorker(context: Context, params: WorkerParameters) : CoroutineWork
 
                     // Send notification if it expires in exactly 1 day (or close to it)
                     // We check if it's between 0 and 1 day to be safe, depending on when the worker runs.
-                    if (daysUntilExpiry == 1L) {
+                    if (daysUntilExpiry <= 1L) {
                         notificationHelper.sendWarrantyExpiryNotification(asset.name)
                     }
                 }

@@ -84,7 +84,7 @@ fun AssetCollectionScreen(
                 onClick = {
                     navController.navigate("add_asset")
                 },
-                containerColor = Teal700,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
                 shape = RoundedCornerShape(50)
             ) {
@@ -109,8 +109,8 @@ fun AssetCollectionScreen(
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = LightGrey,
-                    unfocusedContainerColor = LightGrey,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent
                 )
@@ -131,7 +131,7 @@ fun AssetCollectionScreen(
                         label = { Text(category) },
                         shape = RoundedCornerShape(20.dp),
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Teal700,
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = Color.White
                         )
                     )
@@ -195,7 +195,7 @@ fun AssetCard(asset: Asset, onEdit: () -> Unit) {
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Teal200, RoundedCornerShape(12.dp)),
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (categoryIcon != 0) {
@@ -242,12 +242,12 @@ fun AssetCard(asset: Asset, onEdit: () -> Unit) {
                             Icons.Default.Edit,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = Teal700
+                            tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             stringResource(R.string.edit_button),
-                            color = Teal700,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                     }

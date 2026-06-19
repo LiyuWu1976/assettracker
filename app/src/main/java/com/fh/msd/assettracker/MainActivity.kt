@@ -12,12 +12,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
@@ -36,13 +36,17 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            Log.d("MainActivity", "Notification permission granted")
-        } else {
-            Log.d("MainActivity", "Notification permission denied")
+    private val requestPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach {
+            val permissionName = it.key
+            val isGranted = it.value
+            if (isGranted) {
+                Log.d("MainActivity", "$permissionName granted")
+            } else {
+                Log.d("MainActivity", "$permissionName denied")
+            }
         }
     }
 
@@ -56,9 +60,12 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+                var isSplashFinished by remember { mutableStateOf(false) }
 
-                LaunchedEffect(isLoggedIn) {
-                    Log.d("MainActivity", "isLoggedIn change detected: $isLoggedIn")
+                LaunchedEffect(isLoggedIn, isSplashFinished) {
+                    Log.d("MainActivity", "isLoggedIn change detected: $isLoggedIn, splashFinished: $isSplashFinished")
+                    if (!isSplashFinished) return@LaunchedEffect
+
                     if (isLoggedIn) {
                         triggerImmediateWarrantyCheck()
                         if (navController.currentDestination?.route != "collection") {
@@ -85,9 +92,14 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = if (isLoggedIn) "collection" else "login",
+                        startDestination = "splash",
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable("splash") {
+                            SplashScreen(onAnimationFinished = {
+                                isSplashFinished = true
+                            })
+                        }
                         composable("login") {
                             LoginScreen(navController, authViewModel)
                         }
@@ -143,7 +155,7 @@ class MainActivity : ComponentActivity() {
 
     private fun scheduleWarrantyCheck() {
         val warrantyWorkRequest = PeriodicWorkRequestBuilder<WarrantyWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(24, TimeUnit.HOURS)
+            .setInitialDelay(5, TimeUnit.MINUTES)
             .build()
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
@@ -167,7 +179,7 @@ class MainActivity : ComponentActivity() {
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                requestPermissionsLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
             }
         }
     }

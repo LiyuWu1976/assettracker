@@ -45,6 +45,8 @@
     <string name="search_hint">Quick Search</string>
     <string name="edit_button">EDIT</string>
     <string name="image_placeholder">IMAGE</string>
+    <string name="cat_all">All</string>
+    <string name="no_matches_msg">No assets match your filters</string>
 
     <!-- ADD ASSET -->
     <string name="add_asset_title">Add New Asset</string>
@@ -65,6 +67,7 @@
 
     <!-- EDIT ASSET -->
     <string name="edit_asset_title">Edit Asset</string>
+    <string name="asset_warranty_expiry">Warranty Expiry</string>
     <string name="btn_delete">Delete</string>
     <string name="confirm_cancel_title">Discard Changes?</string>
     <string name="confirm_cancel_msg">Are you sure you want to discard your changes?</string>

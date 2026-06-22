@@ -48,9 +48,9 @@ class WarrantyWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 val today = Calendar.getInstance()
 
                 for (asset in assets) {
+
                     val expiry = asset.warrantyExpiry ?: continue
 
-                    // Calculate the difference in days
                     val diff = expiry.time - today.timeInMillis
                     val daysUntilExpiry = TimeUnit.MILLISECONDS.toDays(diff)
 
